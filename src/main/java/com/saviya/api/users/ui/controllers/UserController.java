@@ -32,7 +32,8 @@ public class UserController {
 	@GetMapping("/status/check")
 	public String getStatus() {
 
-		return "working on port :- " + environemnt.getProperty("local.server.port") + " token secret :->" + environemnt.getProperty("token.secret");
+		return "working on port :- " + environemnt.getProperty("local.server.port") + " token secret :->"
+				+ environemnt.getProperty("token.secret");
 	}
 
 	@PostMapping
@@ -42,9 +43,14 @@ public class UserController {
 		mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 		UserDto userDto = mapper.map(userDetail, UserDto.class);
 		UserDto careatedUser = userService.createUser(userDto);
-		
+
 		CreateUserResponseModel response = mapper.map(careatedUser, CreateUserResponseModel.class);
-		return  ResponseEntity.status(HttpStatus.CREATED).body(response);
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
+	@GetMapping
+	public ResponseEntity<String> getUserProducts() {
+
+		return ResponseEntity.status(HttpStatus.OK).body(userService.productServiceStatusCheck());
+	}
 }

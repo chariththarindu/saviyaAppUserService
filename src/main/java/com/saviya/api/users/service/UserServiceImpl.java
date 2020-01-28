@@ -12,21 +12,29 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.saviya.api.users.client.BusinessProductServiceClient;
 import com.saviya.api.users.dto.UserDto;
 import com.saviya.api.users.enitity.UserEntity;
 import com.saviya.api.users.repository.UserRepository;
 
+import feign.FeignException;
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
 
 	UserRepository userRepository;
 	BCryptPasswordEncoder brcyptPasswordEncorder;
+	BusinessProductServiceClient businessProductServiceClient;
 
 	@Autowired
-	public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder brcyptPasswordEncorder) {
+	public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder brcyptPasswordEncorder,
+			BusinessProductServiceClient businessProductServiceClient) {
 
 		this.userRepository = userRepository;
 		this.brcyptPasswordEncorder = brcyptPasswordEncorder;
+		this.businessProductServiceClient = businessProductServiceClient;
 	}
 
 	@Override
@@ -62,6 +70,19 @@ public class UserServiceImpl implements UserService {
 		mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
 		return mapper.map(user, UserDto.class);
+	}
+
+	@Override
+	public String productServiceStatusCheck() {
+
+		String response = null;
+
+		log.info("Before calling business product service");
+		response = businessProductServiceClient.getBusinessProduct();
+		log.info("after calling business product service");
+		//log.error(e.getMessage());
+
+		return response;
 	}
 
 }
